@@ -24,6 +24,7 @@ pub const Rgb565 = packed struct {
             .r = @intToFloat(f32, self.r) / maxInt(u5),
             .g = @intToFloat(f32, self.g) / maxInt(u6),
             .b = @intToFloat(f32, self.b) / maxInt(u5),
+            .a = 1,
         };
     }
 
@@ -36,16 +37,17 @@ pub const Rgb888 = struct {
 };
 comptime {
     std.debug.assert(@bitSizeOf(Rgb565) == 16);
-    std.debug.assert(@bitSizeOf(Rgbf) == 96);
+    //std.debug.assert(@bitSizeOf(Rgbf) == 96);
 }
 
 pub const Rgbf = struct {
-    r: f32, g: f32, b: f32,
+    r: f32, g: f32, b: f32, a: f32,
 
     pub fn assertValid(self: @This()) void {
         std.debug.assert(self.r >= 0 and self.r <= 1);
         std.debug.assert(self.g >= 0 and self.g <= 1);
         std.debug.assert(self.b >= 0 and self.b <= 1);
+        std.debug.assert(self.a >= 0 and self.a <= 1);
     }
 
     pub fn as16bit(self: @This()) Rgb565 {
@@ -75,6 +77,7 @@ pub const Rgbf = struct {
             .r = self.r * scalar,
             .g = self.g * scalar,
             .b = self.b * scalar,
+            .a = 1,
         };
     }
 
@@ -83,6 +86,7 @@ pub const Rgbf = struct {
             .r = self.r / scalar,
             .g = self.g / scalar,
             .b = self.b / scalar,
+            .a = 1,
         };
     }
 
@@ -91,6 +95,7 @@ pub const Rgbf = struct {
             .r = self.r + other.r,
             .g = self.g + other.g,
             .b = self.b + other.b,
+            .a = 1,
         };
     }
 };
@@ -109,6 +114,14 @@ pub fn getPixelDxt1Chunk(data: *const [8]u8, x: u2, y: u2) ?Rgb565 {
     return codeToColor(code, color0, color1);
 }
 
+pub const Rgba5658 = struct {};
+pub fn getPixelDxt3Chunk(data: *const [16]u8, x: u2, y: u2) Rgba5658 {
+    _ = data;
+    _ = x;
+    _ = y;
+    @compileError("todo");    
+}
+
 pub fn getPixelDxt1(
     image: Image,
     x: u16,
@@ -120,7 +133,7 @@ pub fn getPixelDxt1(
     const chunks_x = image.width / 4;
     const chunk_x = x / 4;
     const chunk_y = y / 4;
-    const chunk_i = chunk_y * chunks_x + chunk_x;
+    const chunk_i: u32 = chunk_y * chunks_x + chunk_x;
     
     // do this magic instead of data[chunk_i*8..chunk_i*8+8]
     // so that chunk can cast to *const [8]u8 in getPixelDxt1Chunk
@@ -130,7 +143,6 @@ pub fn getPixelDxt1(
     const local_y = @truncate(u2, y % 4);
     return getPixelDxt1Chunk(chunk, local_x, local_y);
 }
-
 
 fn codeToColor(code: u2, col0: u16, col1: u16) ?Rgb565 {
     const col0_rgb = Rgb565.fromInt(col0);
