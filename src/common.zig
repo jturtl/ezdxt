@@ -34,10 +34,6 @@ pub const Rgb565 = packed struct {
 
 pub const Rgb888 = struct {
     r: u8, g: u8, b: u8,
-
-    comptime {
-        std.debug.assert(@sizeOf(@This()) == 2);
-    }
 };
 
 pub const Rgba8888 = packed struct {
