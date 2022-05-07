@@ -1,7 +1,10 @@
 # **ezDXT**
 (easy DXT - *ee zee dee eks tee*)
 ### Tiny library for reading and encoding DXT/S3TC images.
-//todo: DXT3 and DXT5
+
+## **Disclaimer**
+**This library was created to help the OpenSrc project and such the only data i've tested with is Source Engine VTF-compatible DXT data. I know zero other instances where DXT compression is used and so i have zero other references for how DXT should behave.**
+Example: according to the [OpenGL Wiki](https://www.khronos.org/opengl/wiki/S3_Texture_Compression), in DXT3 *"color0 is always assumed to be less than color1 in terms of determining how to use the codes to extract the color value,"* but this behavior does not match the Source Engine, as tested by the **VTFEdit** and **no_vtf** tools.
 # Usage
 ### Prerequisites
 - Latest Zig compiler (v9/v10-dev, 2022-05-04)
