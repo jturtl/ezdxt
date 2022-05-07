@@ -51,10 +51,26 @@ pub const Rgba5654 = packed struct {
         std.debug.assert(@bitSizeOf(@This()) == 32);
         std.debug.assert(@sizeOf(@This()) == 4);
     }
+
+    pub fn asRgba(self: @This()) Rgba {
+        const maxInt = std.math.maxInt;
+        return Rgba {
+            .r = @intToFloat(f32, self.r) / maxInt(u5),
+            .g = @intToFloat(f32, self.g) / maxInt(u6),
+            .b = @intToFloat(f32, self.b) / maxInt(u5),
+            .a = @intToFloat(f32, self.a) / maxInt(u4),
+        };
+    }
 };
 
-pub const Rgba = struct {
+pub const Rgba = extern struct {
     r: f32, g: f32, b: f32, a: f32,
+
+    pub const black = @This() {.r=0,.g=0,.b=0,.a=1};
+    pub const transparent = @This() {
+        .a = 0,
+        .r = undefined, .g = undefined, .b = undefined,
+    };
 
     pub fn assertValid(self: @This()) void {
         std.debug.assert(self.r >= 0 and self.r <= 1);

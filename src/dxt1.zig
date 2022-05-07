@@ -2,12 +2,13 @@ const std = @import("std");
 const common = @import("common.zig");
 
 const Rgb565 = common.Rgb565;
+const Rgba = common.Rgba;
 
 pub fn getPixel(
     img: common.Image,
     x: u16,
     y: u16,
-) ?Rgb565 {
+) Rgba {
     std.debug.assert(x < img.width);
     std.debug.assert(y < img.height);
 
@@ -31,15 +32,19 @@ pub fn getPixelNoAlpha(
     img: common.Image,
     x: u16,
     y: u16,
-) Rgb565 {
-    return getPixel(img, x, y) orelse Rgb565.fromInt(0);
+) Rgba {
+    const px = getPixel(img, x, y);
+    if (px.a == 0)
+        return Rgba.black
+    else
+        return px;
 }
 
 pub fn getPixelChunk(
     data: *const[8]u8,
     x: u2,
     y: u2,
-) ?Rgb565 {
+) Rgba {
     const color0 = std.mem.readIntLittle(u16, data[0..2]);
     const color1 = std.mem.readIntLittle(u16, data[2..4]);
     const codes_int = std.mem.readIntLittle(u32, data[4..8]);
@@ -55,27 +60,31 @@ pub fn getPixelChunkNoAlpha(
     data: *const[8]u8,
     x: u2,
     y: u2,
-) Rgb565 {
-     return getPixelChunk(data, x, y) orelse Rgb565.fromInt(0);   
+) Rgba {
+        const px = getPixelChunk(data, x, y);
+        if (px.a == 0)
+            return Rgba.black
+        else
+            return px; 
 }
 
-fn codeToColor(code: u2, col0: u16, col1: u16) ?Rgb565 {
+fn codeToColor(code: u2, col0: u16, col1: u16) Rgba {
     const col0_rgb = Rgb565.fromInt(col0);
     const col1_rgb = Rgb565.fromInt(col1);
-    const col0_rgbf = col0_rgb.asRgba();
-    const col1_rgbf = col1_rgb.asRgba();
+    const col0_rgba = col0_rgb.asRgba();
+    const col1_rgba = col1_rgb.asRgba();
     
     return switch (code) {
-        0b00 => col0_rgb,
-        0b01 => col1_rgb,
+        0b00 => col0_rgba,
+        0b01 => col1_rgba,
         0b10 => if (col0 > col1)
-                    col0_rgbf.mul(2).add(col1_rgbf).div(3).asRgb565()
+                    col0_rgba.mul(2).add(col1_rgba).div(3)
                 else
-                    col0_rgbf.add(col1_rgbf).div(2).asRgb565(),
+                    col0_rgba.add(col1_rgba).div(2),
         0b11 => if (col0 > col1)
-                    col0_rgbf.add(col1_rgbf.mul(2)).div(3).asRgb565()
+                    col0_rgba.add(col1_rgba.mul(2)).div(3)
                 else
-                    null,
+                    Rgba.transparent,
     };
 }
 
