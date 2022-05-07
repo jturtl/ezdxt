@@ -17,15 +17,17 @@ int main(void) {
         return 1;
 
     // PPM file header
-    (void)fprintf(outfile, "P3 %d %d 255\n", img.width, img.height);
+    fprintf(outfile, "P3 %d %d 255\n", img.width, img.height);
 
     for (uint16_t y = 0; y < img.height; y++)
         for (uint16_t x = 0; x < img.width; x++) {
-            const ezdxt_rgb565 px16bit = ezdxt_get_pixel_dxt1_noalpha(img, x, y);
-            const ezdxt_rgb888 px = ezdxt_rgb888_from_565(px16bit);
-            (void)fprintf(outfile, "%d %d %d\n", px.r, px.g, px.b);
+            const ezdxt_color px = ezdxt1_get_pixel_noalpha(img, x, y);
+            const uint8_t r = px.r*255,
+                g = px.g*255,
+                b = px.b*255;
+            fprintf(outfile, "%d %d %d\n", r, g, b);
         }
 
-    (void)fclose(outfile);
+    fclose(outfile);
     return 0;
 }

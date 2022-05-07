@@ -24,10 +24,9 @@ pub fn main() !void {
     while (y < 8) : (y += 1) {
         var x: u4 = 0;
         while (x < 8) : (x += 1) {
-            const px_16 = ezdxt.getPixelDxt1(img, x, y)
-                orelse ezdxt.Rgb565.fromInt(0);
-            const px = px_16.as24bit();
-            idx += (try print(buf[idx..], "{} {} {}\n", .{px.r, px.g, px.b})).len;
+            const px = ezdxt.dxt1.getPixelNoAlpha(img, x, y);
+            const rgb = px.asRgb888();
+            idx += (try print(buf[idx..], "{} {} {}\n", .{rgb.r, rgb.g, rgb.b})).len;
         }
     }
 
