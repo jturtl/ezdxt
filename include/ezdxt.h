@@ -44,6 +44,9 @@ inline ezdxt_color ezdxt1_get_pixel_chunk_noalpha(const uint8_t *data, uint16_t 
 ezdxt_color ezdxt3_get_pixel(ezdxt_image, uint16_t x, uint16_t y);
 ezdxt_color ezdxt3_get_pixel_chunk(const uint8_t *data, uint8_t x, uint8_t y);
 
+ezdxt_color ezdxt5_get_pixel(ezdxt_image, uint16_t x, uint16_t y);
+ezdxt_color ezdxt5_get_pixel_chunk(const uint8_t *data, uint8_t x, uint8_t y);
+
 #undef alias
 
 #endif

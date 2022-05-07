@@ -70,3 +70,27 @@ export fn ezdxt3_get_pixel_chunk(
     );
 }
 
+export fn ezdxt5_get_pixel(
+    image: Image,
+    x: u16,
+    y: u16,
+) Rgba {
+    return dxt5.getPixel(
+        image.toEzdxt(),
+        @intCast(u2, x),
+        @intCast(u2, y),
+    );
+}
+
+export fn ezdxt5_get_pixel_chunk(
+    data: *const [16]u8,
+    x: u8,
+    y: u8,
+) Rgba {
+    return dxt5.getPixelChunk(
+        data,
+        @intCast(u2, x),
+        @intCast(u2, y),
+    );
+}
+
