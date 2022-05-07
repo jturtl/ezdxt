@@ -19,7 +19,3 @@ Example: according to the [OpenGL Wiki](https://www.khronos.org/opengl/wiki/S3_T
     - `libezdxt.a` (Linux/MacOS/Other UNIX-likes)
     - `ezdxt.lib` (Windows)
 3. (for C/C++ projects) use `./include/ezdxt.h(pp)`
-## As a shared library
-//todo
-## As a Zig package
-//todo
