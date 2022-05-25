@@ -1,0 +1,16 @@
+https://cbloomrants.blogspot.com/2008/12/12-08-08-dxtc-summary.html
+
+FAST COMPRESSION
+Realtime Compression for High-Resolution Content
+  https://web.archive.org/web/20100730082907/https://www.evl.uic.edu/files/pdf/ag2007-renambot.pdf
+Real-Time DXT Compression (from id Software)
+  https://web.archive.org/web/20090104211100/http://cache-www.intel.com/cd/00/00/32/43/324337_324337.pdf
+FastDXT (GPL source code download)
+  https://www.evl.uic.edu/cavern/fastdxt/
+
+HIGH QUALITY COMPRESSION
+stb_dxt - this guy really does everything
+  https://github.com/nothings/stb/blob/master/stb_dxt.h
+libsquish - referenced by ^ that one
+  https://github.com/svn2github/libsquish
+  https://www.sjbrown.co.uk/posts/dxt-compression-techniques/
