@@ -32,7 +32,7 @@ pub const Rgb565 = packed struct {
     }
 };
 
-pub const Rgb888 = struct {
+pub const Rgb888 = packed struct {
     r: u8, g: u8, b: u8,
 };
 
@@ -60,7 +60,7 @@ pub const Rgba5654 = packed struct {
 };
 
 pub const Rgba = extern struct {
-    r: f32, g: f32, b: f32, a: f32,
+    r: f32, g: f32, b: f32, a: f32 = 1,
 
     pub const black = @This() {.r=0,.g=0,.b=0,.a=1};
     pub const transparent = @This() {
@@ -100,6 +100,17 @@ pub const Rgba = extern struct {
             .b = @floatToInt(u8, self.b * maxInt(u8)),
         };        
     }
+     pub fn asRgba8888(self: @This()) Rgba8888 {
+        self.assertValid();
+
+        const maxInt = std.math.maxInt;
+        return .{
+            .r = @floatToInt(u8, self.r * maxInt(u8)),
+            .g = @floatToInt(u8, self.g * maxInt(u8)),
+            .b = @floatToInt(u8, self.b * maxInt(u8)),
+            .a = @floatToInt(u8, self.a * maxInt(u8)),
+        };        
+    }
 
     pub fn mul(self: @This(), scalar: f32) @This() {
         return .{
@@ -126,6 +137,39 @@ pub const Rgba = extern struct {
             .b = self.b + other.b,
             .a = 1,//todo: alpha blending?
         };
+    }
+
+    // exact float comparisons are bad, dont use this
+    pub fn eql(self: @This(), other: @This()) bool {
+        return self.r == other.r and self.g == other.g and self.b == other.b and self.a == other.a;
+    }
+
+    pub fn almostEq(self: @This(), other: @This()) bool {
+        return self.approxEq(other, 0.1);
+    }
+
+    pub fn approxEq(self: @This(), other: @This(), tolerance: f32) bool {
+        const aeq = std.math.approxEqAbs;
+        return
+            aeq(f32, self.r, other.r, tolerance) and
+            aeq(f32, self.g, other.g, tolerance) and
+            aeq(f32, self.b, other.b, tolerance) and
+            aeq(f32, self.a, other.a, tolerance);
+    }
+
+
+    pub fn format(
+        self: @This(),
+        comptime fmt: []const u8,
+        options: anytype,
+        writer: anytype,
+    ) !void {
+        _ = fmt;
+        _ = options;
+        try writer.print(
+            "RGBA ({d}, {d}, {d}, {d})",
+            .{self.r, self.g, self.b, self.a}
+        );
     }
 };
 

@@ -61,11 +61,50 @@ pub fn getPixelChunkNoAlpha(
     x: u2,
     y: u2,
 ) Rgba {
-        const px = getPixelChunk(data, x, y);
-        if (px.a == 0)
-            return Rgba.black
-        else
-            return px; 
+    const px = getPixelChunk(data, x, y);
+    if (px.a == 0)
+        return Rgba.black
+    else
+        return px; 
+}
+
+//TODO: transparency
+pub fn encodeChunk(
+    pixels: *const [16]Rgba,
+    output: *[8]u8,
+    use_alpha: bool,
+) void {
+    _ = use_alpha;
+    @import("encode.zig").simpleColorEncode(pixels, output);
+}
+
+pub fn encodeImage(
+    data: []const Rgba,
+    width: u16,
+    height: u16,
+    output: []u8,
+) void {
+    std.debug.assert(output.len == (@as(u32, width) * height)/2);
+
+    const nchunks_x = width / 4;
+    const nchunks_y = height / 4;
+
+    var i: u16 = 0;
+    var y: u8 = 0;
+    while (y < nchunks_y) : (y += 1) {
+        var x: u8 = 0;
+        while (x < nchunks_x) : (x += 1) {
+            const row0 = data[@as(u32, 4)*y*width+@as(u32, 4)*x..][0..4].*;
+            const row1 = data[@as(u32, 4)*y*width+@as(u32, 4)*x+width*1..][0..4].*;
+            const row2 = data[@as(u32, 4)*y*width+@as(u32, 4)*x+width*2..][0..4].*;
+            const row3 = data[@as(u32, 4)*y*width+@as(u32, 4)*x+width*3..][0..4].*;
+            const chunk = [4][4]Rgba{
+                row0,row1,row2,row3,
+            };
+            encodeChunk(@ptrCast(*const[16]Rgba, &chunk), output[@as(u32, i)*8..][0..8], false);
+            i += 1;
+        }
+    }
 }
 
 fn codeToColor(code: u2, col0: u16, col1: u16) Rgba {
