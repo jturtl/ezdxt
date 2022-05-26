@@ -46,6 +46,27 @@ export fn ezdxt1_get_pixel_chunk(
     return dxt1.getPixelChunk(data, _x, _y);
 }
 
+export fn ezdxt1_encode_chunk(
+    data: *const [16]Rgba,
+    output: *[8]u8,
+) void {
+    ezdxt.dxt1.encodeChunk(data, output, false);
+}
+
+export fn ezdxt1_encode_image(
+    data: [*]const Rgba,
+    width: u16,
+    height: u16,
+    output: [*]u8,
+) void {
+    const pixel_count = @as(u32, width) * height;
+
+    var data_slice = data[0..pixel_count];
+    var output_slice = output[0..pixel_count];
+
+    ezdxt.dxt1.encodeImage(data_slice, width, height, output_slice);
+}
+
 export fn ezdxt3_get_pixel(
     image: Image,
     x: u16,

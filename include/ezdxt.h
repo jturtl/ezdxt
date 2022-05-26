@@ -41,6 +41,18 @@ inline ezdxt_color ezdxt1_get_pixel_chunk_noalpha(const uint8_t *data, uint16_t 
     return px;
 }
 
+void ezdxt1_encode_chunk(
+    const ezdxt_color data[16],
+    uint8_t output[8]
+);
+
+void ezdxt1_encode_image(
+    const ezdxt_color *data,
+    uint16_t width,
+    uint16_t height,
+    uint8_t *output
+);
+
 ezdxt_color ezdxt3_get_pixel(ezdxt_image, uint16_t x, uint16_t y);
 ezdxt_color ezdxt3_get_pixel_chunk(const uint8_t *data, uint8_t x, uint8_t y);
 
