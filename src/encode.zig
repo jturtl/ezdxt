@@ -34,6 +34,22 @@ pub fn simpleColorEncode(
     }
     // END HACK
 
+    //HACK 2: ELECTRIC BOOGALOO
+    // If col1(min) >= col0(max), then code 0b11 will be solid black.
+    // However this algorithm never wants that. Make sure min and max are
+    // always different
+    if (@bitCast(u16, min) == @bitCast(u16, max)) {
+        // std.log.warn("min and max colors are identical as RGB565({X:0>4})", .{@bitCast(u16, min)});
+        // std.log.warn("HACK : working around this by changing max.g", .{});
+        // Basic overflow protection
+        if (max.g == std.math.maxInt(u6)) {
+            max.g -%= 1; // if g = 0 then.. too bad!
+        } else {
+            max.g += 1;
+        }
+    }
+    // END HACK
+    
     if (@bitCast(u16, min) > @bitCast(u16, max)) {
         std.mem.swap(common.Rgb565, &min, &max);
         std.mem.swap(Rgba, &min_rgba, &max_rgba);
