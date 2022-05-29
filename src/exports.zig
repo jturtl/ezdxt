@@ -11,9 +11,8 @@ const Image = extern struct {
     height: u16,
 
     pub fn toEzdxt(self: @This()) ezdxt.Image {
-        var data: []const u8 = undefined;
-        data.ptr = self.data;
-        data.len = (@as(u32, self.width) * self.height) / 2;
+        const len = (@as(u32, self.width) * self.height) / 2;
+        const data = self.data[0..len];
         return ezdxt.Image {
             .data = data,
             .width = self.width,
