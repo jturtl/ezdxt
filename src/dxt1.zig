@@ -107,6 +107,38 @@ pub fn encodeImage(
     }
 }
 
+pub fn decodeImage(
+    compressed: []const u8,
+    width: u16, 
+    height: u16,
+    output: []Rgba,
+) void {
+    std.debug.assert(compressed.len == (@as(u32, width) * height)/2);
+    std.debug.assert(output.len == @as(u32, width) * height);
+
+    const nchunks_x = width / 4;
+    const nchunks_y = height / 4;
+
+    var chunk_y: u8 = 0;
+    while (chunk_y < nchunks_y) : (chunk_y += 1) {
+        var chunk_x: u8 = 0;
+        while (chunk_x < nchunks_x) : (chunk_x += 1) {
+            const chunk_idx = chunk_y * nchunks_x + chunk_x;
+            const chunk_data = compressed[chunk_idx * 8..][0..8];
+
+            var y: u2 = 0;
+            while (y < 4) : (y += 1) {
+                var x: u2 = 0;
+                while (x < 4) : (x += 1) {
+                    const pixel = getPixelChunk(chunk_data, x, y);
+                    const out_idx = @as(u32, chunk_y * 4 + y) * width + (chunk_x * 4 + x);
+                    output[out_idx] = pixel;
+                }
+            }
+        }
+    }
+}
+
 fn codeToColor(code: u2, col0: u16, col1: u16) Rgba {
     const col0_rgb = Rgb565.fromInt(col0);
     const col1_rgb = Rgb565.fromInt(col1);
@@ -127,3 +159,35 @@ fn codeToColor(code: u2, col0: u16, col1: u16) Rgba {
     };
 }
 
+test "DXT1 encode/decode cycle for 8x8 image" {
+    const testing = std.testing;
+    
+    // Create an 8x8 test image with some distinct colors
+    var original: [64]Rgba = undefined;
+    for (&original, 0..) |*px, i| {
+        px.* = switch (i % 4) {
+            0 => Rgba{ .r = 1.0, .g = 0.0, .b = 0.0, .a = 1.0 }, // Red
+            1 => Rgba{ .r = 0.0, .g = 1.0, .b = 0.0, .a = 1.0 }, // Green
+            2 => Rgba{ .r = 0.0, .g = 0.0, .b = 1.0, .a = 1.0 }, // Blue
+            3 => Rgba{ .r = 1.0, .g = 1.0, .b = 1.0, .a = 1.0 }, // White
+            else => unreachable,
+        };
+    }
+
+    // Encode
+    var compressed: [256]u8 = undefined;
+    encodeImage(&original, 8, 8, &compressed);
+
+    // Decode
+    var decoded: [64]Rgba = undefined;
+    decodeImage(&compressed, 8, 8, &decoded);
+
+    // Compare results (with some tolerance due to lossy compression)
+    const tolerance = 0.1;
+    for (original, decoded) |orig, dec| {
+        try testing.expect(@abs(orig.r - dec.r) <= tolerance);
+        try testing.expect(@abs(orig.g - dec.g) <= tolerance);
+        try testing.expect(@abs(orig.b - dec.b) <= tolerance);
+        try testing.expect(@abs(orig.a - dec.a) <= tolerance);
+    }
+}
