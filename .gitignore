@@ -2,3 +2,4 @@ zig-out
 zig-cache
 *.ppm
 */a.out
+.zig-cache

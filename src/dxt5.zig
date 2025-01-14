@@ -17,8 +17,8 @@ pub fn getPixel(
     const chunk_y = y / 4;
     const chunk_i: u32 = chunk_y*chunk_count_x + chunk_x;
     const chunk = image.data[chunk_i*16..].ptr[0..16];
-    const local_x = @truncate(u2, x);
-    const local_y = @truncate(u2, y);
+    const local_x = @as(u2, @truncate(x));
+    const local_y = @as(u2, @truncate(y));
     return getPixelChunk(chunk, local_x, local_y);
 }
 
@@ -39,13 +39,20 @@ pub fn getPixelChunk(
 fn getAlphaValue(data: *const [8]u8, x: u2, y: u2) f32 {
     const alpha0 = data[0];
     const alpha1 = data[1];
-    const alpha0f = @intToFloat(f32, alpha0)/255;
-    const alpha1f = @intToFloat(f32, alpha1)/255;
+    const alpha0f: f32 = @as(f32, @floatFromInt(alpha0))/255;
+    const alpha1f: f32 = @as(f32, @floatFromInt(alpha1))/255;
 
-    const codes = std.mem.readIntLittle(u48, data[2..]);
+    // const codes: u48 = std.mem.bytesAsSlice(u48, data[2..])[0];
+    // WORKAROUND
+    const codes: u48 = @as(u48, data[7]) << 40 | 
+                  @as(u48, data[6]) << 32 |
+                  @as(u48, data[5]) << 24 |
+                  @as(u48, data[4]) << 16 |
+                  @as(u48, data[3]) << 8 |
+                  @as(u48, data[2]);
 
     const bit_pos = 3 * (@as(u6, y) * 4 + x);
-    const code = @truncate(u3, codes >> bit_pos);
+    const code = @as(u3, @truncate(codes >> bit_pos));
 
     if (alpha0 > alpha1) {
         return switch (code) {
@@ -77,12 +84,12 @@ fn getColor(
     x: u2,
     y: u2,
 ) Rgba {
-    const color0 = std.mem.readIntLittle(u16, data[0..2]);
-    const color1 = std.mem.readIntLittle(u16, data[2..4]);
-    const codes = std.mem.readIntLittle(u32, data[4..8]);
+    const color0: u16 = std.mem.bytesAsSlice(u16, data[0..2])[0];
+    const color1: u16 = std.mem.bytesAsSlice(u16, data[2..4])[0];
+    const codes: u32 = std.mem.bytesAsSlice(u32, data[4..8])[0];
 
     const bit_pos = 2 * (@as(u5, y) * 4 + @as(u5, x));
-    const code = @truncate(u2, codes >> bit_pos);
+    const code = @as(u2, @truncate(codes >> bit_pos));
 
     return codeToColor(code, color0, color1);
 }

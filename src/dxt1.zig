@@ -22,8 +22,8 @@ pub fn getPixel(
     const chunk = img.data[chunk_i*8..].ptr[0..8];
 
     // faster than (x % 4)? Same result, anyway.
-    const local_x = @truncate(u2, x);
-    const local_y = @truncate(u2, y);
+    const local_x = @as(u2, @truncate(x));
+    const local_y = @as(u2, @truncate(y));
     return getPixelChunk(chunk, local_x, local_y);
 }
 
@@ -45,13 +45,13 @@ pub fn getPixelChunk(
     x: u2,
     y: u2,
 ) Rgba {
-    const color0 = std.mem.readIntLittle(u16, data[0..2]);
-    const color1 = std.mem.readIntLittle(u16, data[2..4]);
-    const codes_int = std.mem.readIntLittle(u32, data[4..8]);
+    const color0: u16 = std.mem.bytesAsSlice(u16, data[0..2])[0];
+    const color1: u16 = std.mem.bytesAsSlice(u16, data[2..4])[0];
+    const codes_int: u32 = std.mem.bytesAsSlice(u32, data[4..8])[0];
     
     // magic!
     const bit_pos = 2 * (@as(u5, y) * 4 + x);
-    const code = @truncate(u2, codes_int >> bit_pos);
+    const code = @as(u2, @truncate(codes_int >> bit_pos));
 
     return codeToColor(code, color0, color1);
 }
@@ -101,7 +101,7 @@ pub fn encodeImage(
             const chunk = [4][4]Rgba{
                 row0,row1,row2,row3,
             };
-            encodeChunk(@ptrCast(*const[16]Rgba, &chunk), output[@as(u32, i)*8..][0..8], false);
+            encodeChunk(@as(*const[16]Rgba, @ptrCast(&chunk)), output[@as(u32, i)*8..][0..8], false);
             i += 1;
         }
     }

@@ -39,8 +39,8 @@ export fn ezdxt1_get_pixel_chunk(
     y: u8,
 ) Rgba {
     // @intCast not @truncate, for runtime safety+catching invalid arguments
-    const _x = @intCast(u2, x);
-    const _y = @intCast(u2, y);
+    const _x: u2 = @intCast(x);
+    const _y: u2 = @intCast(y);
 
     return dxt1.getPixelChunk(data, _x, _y);
 }
@@ -60,8 +60,8 @@ export fn ezdxt1_encode_image(
 ) void {
     const pixel_count = @as(u32, width) * height;
 
-    var data_slice = data[0..pixel_count];
-    var output_slice = output[0..pixel_count];
+    const data_slice = data[0..pixel_count];
+    const output_slice = output[0..pixel_count];
 
     ezdxt.dxt1.encodeImage(data_slice, width, height, output_slice);
 }
@@ -73,8 +73,8 @@ export fn ezdxt3_get_pixel(
 ) Rgba {
     return dxt3.getPixel(
         image.toEzdxt(),
-        @intCast(u2, x),
-        @intCast(u2, y),
+        @as(u2, @intCast(x)),
+        @as(u2, @intCast(y)),
     );
 }
 
@@ -85,8 +85,8 @@ export fn ezdxt3_get_pixel_chunk(
 ) Rgba {
     return dxt3.getPixelChunk(
         data,
-        @intCast(u2, x),
-        @intCast(u2, y),
+        @as(u2, @intCast(x)),
+        @as(u2, @intCast(y)),
     );
 }
 
@@ -97,8 +97,8 @@ export fn ezdxt5_get_pixel(
 ) Rgba {
     return dxt5.getPixel(
         image.toEzdxt(),
-        @intCast(u2, x),
-        @intCast(u2, y),
+        @as(u2, @intCast(x)),
+        @as(u2, @intCast(y)),
     );
 }
 
@@ -109,8 +109,8 @@ export fn ezdxt5_get_pixel_chunk(
 ) Rgba {
     return dxt5.getPixelChunk(
         data,
-        @intCast(u2, x),
-        @intCast(u2, y),
+        @as(u2, @intCast(x)),
+        @as(u2, @intCast(y)),
     );
 }
 

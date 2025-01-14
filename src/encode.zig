@@ -38,7 +38,7 @@ pub fn simpleColorEncode(
     // If col1(min) >= col0(max), then code 0b11 will be solid black.
     // However this algorithm never wants that. Make sure min and max are
     // always different
-    if (@bitCast(u16, min) == @bitCast(u16, max)) {
+    if (@as(u16, @bitCast(min)) == @as(u16, @bitCast(max))) {
         // std.log.warn("min and max colors are identical as RGB565({X:0>4})", .{@bitCast(u16, min)});
         // std.log.warn("HACK : working around this by changing max.g", .{});
         // Basic overflow protection
@@ -50,7 +50,7 @@ pub fn simpleColorEncode(
     }
     // END HACK
     
-    if (@bitCast(u16, min) > @bitCast(u16, max)) {
+    if (@as(u16, @bitCast(min)) > @as(u16, @bitCast(max))) {
         std.mem.swap(common.Rgb565, &min, &max);
         std.mem.swap(Rgba, &min_rgba, &max_rgba);
     }
@@ -59,14 +59,14 @@ pub fn simpleColorEncode(
     const code11 = max_rgba.add(min_rgba.mul(2)).div(3);
 
     var codes: [16]u2 = undefined;
-    for (pixels) |px, i| {
+    for (pixels, 0..) |px, i| {
         codes[i] = closestColor(px, [4]Rgba{max_rgba, min_rgba, code10, code11});
     }
 
-    output[0] = @truncate(u8, @bitCast(u16, max));
-    output[1] = @truncate(u8, @bitCast(u16, max) >> 8);
-    output[2] = @truncate(u8, @bitCast(u16, min));
-    output[3] = @truncate(u8, @bitCast(u16, min) >> 8);
+    output[0] = @as(u8, @intCast(@as(u16, @bitCast(max))));
+    output[1] = @as(u8, @intCast(@as(u16, @bitCast(max)) >> 8));
+    output[2] = @as(u8, @intCast(@as(u16, @bitCast(min))));
+    output[3] = @as(u8, @intCast(@as(u16, @bitCast(min)) >> 8));
 
     var codes_int: u32 = 0;
     var i: u8 = 16;
@@ -77,21 +77,20 @@ pub fn simpleColorEncode(
         codes_int |= code;
     }
 
-    std.mem.writeIntLittle(u32, output[4..8], codes_int);
+    std.mem.bytesAsSlice(u32, output[4..8])[0] = codes_int;
 }
 
 fn closestColor(target: Rgba, options: [4]Rgba) u2 {
     var lowest_distance: f32 = 99;
     var closest_color: u2 = 0;
-    for (options) |opt, i| {
+    for (options, 0..) |opt, i| {
         if (colorDistance(target, opt) < lowest_distance) {
             lowest_distance = colorDistance(target, opt);
-            closest_color = @truncate(u2, i);
+            closest_color = @as(u2, @truncate(i));
         }
     }
     return closest_color;
 }
-
 fn colorDistance(a: Rgba, b: Rgba) f32 {
     return ( ( a.r - b.r ) * ( a.r - b.r ) ) +
         ( ( a.g - b.g ) * ( a.g - b.g ) ) +
@@ -132,8 +131,8 @@ fn getUniqueColors(
 ) u8 {
     var len: u8 = 0;
 
-    for (pixels) |px, _pxi| {
-        const pxi = @truncate(u8, _pxi);
+    for (pixels, 0..) |px, _pxi| {
+        const pxi = @as(u8, @truncate(_pxi));
 
         var is_unique = true;
 

@@ -6,18 +6,24 @@ const tests_root = root;
 
 const warn = std.debug.print;
 
-pub fn build(b: *std.build.Builder) void {
-    const mode = b.standardReleaseOptions();
+pub fn build(b: *std.Build) void {
+    const optimize = b.standardOptimizeOption(.{});
     const target = b.standardTargetOptions(.{});
 
-    const lib = b.addStaticLibrary(name, root);
-    lib.setTarget(target);
-    lib.setBuildMode(mode);
-    lib.install();
-    //lib.strip = true;
+    const lib = b.addStaticLibrary(.{
+        .name = "ezdxt",
+        .root_source_file = b.path("src/exports.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    b.installArtifact(lib);
+
+    const main_tests = b.addTest(.{
+        .root_source_file = b.path("src/exports.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
     
-    const main_tests = b.addTest(tests_root);
-    main_tests.setBuildMode(mode);
 
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&main_tests.step);

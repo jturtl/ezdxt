@@ -18,8 +18,8 @@ pub fn getPixel(
     const chunk_y = y / 4;
     const chunk_i: u32 = chunk_y*chunk_count_x + chunk_x;
     const chunk = image.data[chunk_i*16..].ptr[0..16];
-    const local_x = @truncate(u2, x);
-    const local_y = @truncate(u2, y);
+    const local_x = @as(u2, @truncate(x));
+    const local_y = @as(u2, @truncate(y));
     return getPixelChunk(chunk, local_x, local_y);
 }
 
@@ -28,12 +28,12 @@ pub fn getPixelChunk(
     x: u2,
     y: u2,
 ) Rgba {
-    const alpha_chunk = std.mem.readIntLittle(u64, data[0..8]);
+    const alpha_chunk: u64 = std.mem.bytesAsSlice(u64, data[0..8])[0];
     const alpha_value = getAlphaValue(alpha_chunk, x, y);
 
     const color_chunk = data[8..16];
     var color = getColor(color_chunk, x, y);
-    color.a = @intToFloat(f32,alpha_value)/std.math.maxInt(u4);
+    color.a = @as(f32, @floatFromInt(alpha_value))/std.math.maxInt(u4);
     return color;
 }
 
@@ -43,7 +43,7 @@ fn getAlphaValue(
     y: u2,
 ) u4 {
     const bit_pos = 4 * (@as(u6, y) * 4 + x);
-    const value = @truncate(u4, data >> bit_pos);
+    const value = @as(u4, @truncate(data >> bit_pos));
     return value;
 }
 
@@ -52,12 +52,12 @@ fn getColor(
     x: u2,
     y: u2,
 ) Rgba {
-    const color0 = std.mem.readIntLittle(u16, data[0..2]);
-    const color1 = std.mem.readIntLittle(u16, data[2..4]);
-    const codes = std.mem.readIntLittle(u32, data[4..8]);
+    const color0: u16 = std.mem.bytesAsSlice(u16, data[0..2])[0];
+    const color1: u16 = std.mem.bytesAsSlice(u16, data[2..4])[0];
+    const codes: u32 = std.mem.bytesAsSlice(u32, data[4..8])[0];
 
     const bit_pos = 2 * (@as(u5, y) * 4 + @as(u5, x));
-    const code = @truncate(u2, codes >> bit_pos);
+    const code = @as(u2, @truncate(codes >> bit_pos));
 
     return codeToColor(code, color0, color1);
 }

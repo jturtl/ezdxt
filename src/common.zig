@@ -11,18 +11,18 @@ pub const Rgb565 = packed struct {
 
     pub fn fromInt(int: u16) @This() {
         return .{ 
-            .r = @truncate(u5, int >> 11),
-            .g = @truncate(u6, int >> 5),
-            .b = @truncate(u5, int),
+            .r = @as(u5, @truncate(int >> 11)),
+            .g = @as(u6, @truncate(int >> 5)),
+            .b = @as(u5, @truncate(int)),
         };
     }
 
     pub fn asRgba(self: @This()) Rgba {
         const maxInt = std.math.maxInt;
         return Rgba {
-            .r = @intToFloat(f32, self.r) / maxInt(u5),
-            .g = @intToFloat(f32, self.g) / maxInt(u6),
-            .b = @intToFloat(f32, self.b) / maxInt(u5),
+            .r = @as(f32, @floatFromInt(self.r)) / maxInt(u5),
+            .g = @as(f32, @floatFromInt(self.g)) / maxInt(u6),
+            .b = @as(f32, @floatFromInt(self.b)) / maxInt(u5),
             .a = 1,
         };
     }
@@ -51,10 +51,10 @@ pub const Rgba5654 = packed struct {
     pub fn asRgba(self: @This()) Rgba {
         const maxInt = std.math.maxInt;
         return Rgba {
-            .r = @intToFloat(f32, self.r) / maxInt(u5),
-            .g = @intToFloat(f32, self.g) / maxInt(u6),
-            .b = @intToFloat(f32, self.b) / maxInt(u5),
-            .a = @intToFloat(f32, self.a) / maxInt(u4),
+            .r = @as(f32, @floatFromInt(self.r)) / maxInt(u5),
+            .g = @as(f32, @floatFromInt(self.g)) / maxInt(u6),
+            .b = @as(f32, @floatFromInt(self.b)) / maxInt(u5),
+            .a = @as(f32, @floatFromInt(self.a)) / maxInt(u4),
         };
     }
 };
@@ -80,9 +80,9 @@ pub const Rgba = extern struct {
 
         const maxInt = std.math.maxInt;
         return .{
-            .r = @floatToInt(u5, self.r * maxInt(u5)),
-            .g = @floatToInt(u6, self.g * maxInt(u6)),
-            .b = @floatToInt(u5, self.b * maxInt(u5)),
+            .r = @as(u5, @intFromFloat(self.r * maxInt(u5))),
+            .g = @as(u6, @intFromFloat(self.g * maxInt(u6))),
+            .b = @as(u5, @intFromFloat(self.b * maxInt(u5))),
         };
     }
 
@@ -95,9 +95,9 @@ pub const Rgba = extern struct {
 
         const maxInt = std.math.maxInt;
         return .{
-            .r = @floatToInt(u8, self.r * maxInt(u8)),
-            .g = @floatToInt(u8, self.g * maxInt(u8)),
-            .b = @floatToInt(u8, self.b * maxInt(u8)),
+            .r = @as(u8, @intFromFloat(self.r * maxInt(u8))),
+            .g = @as(u8, @intFromFloat(self.g * maxInt(u8))),
+            .b = @as(u8, @intFromFloat(self.b * maxInt(u8))),
         };        
     }
      pub fn asRgba8888(self: @This()) Rgba8888 {
@@ -105,10 +105,10 @@ pub const Rgba = extern struct {
 
         const maxInt = std.math.maxInt;
         return .{
-            .r = @floatToInt(u8, self.r * maxInt(u8)),
-            .g = @floatToInt(u8, self.g * maxInt(u8)),
-            .b = @floatToInt(u8, self.b * maxInt(u8)),
-            .a = @floatToInt(u8, self.a * maxInt(u8)),
+            .r = @as(u8, @intFromFloat(self.r * maxInt(u8))),
+            .g = @as(u8, @intFromFloat(self.g * maxInt(u8))),
+            .b = @as(u8, @intFromFloat(self.b * maxInt(u8))),
+            .a = @as(u8, @intFromFloat(self.a * maxInt(u8))),
         };        
     }
 
