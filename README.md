@@ -7,7 +7,7 @@
 Example: according to the [OpenGL Wiki](https://www.khronos.org/opengl/wiki/S3_Texture_Compression), in DXT3 *"color0 is always assumed to be less than color1 in terms of determining how to use the codes to extract the color value,"* but this behavior does not match the Source Engine, as tested by the **VTFEdit** and **no_vtf** tools.
 # Usage
 ### Prerequisites
-- Latest Zig compiler (v9/v10-dev, 2022-05-04)
+- Zig 0.13.0
 - Computer, preferrably functional
 - Basic command-line interface competency
 ## As a static library
